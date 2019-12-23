@@ -3,7 +3,7 @@ package ru.kpfu.itis.gallows.protocol.request;
 
 
 public class JoinRoomRequest extends Request {
-    private final int TYPE = 1;
+    private final int TYPE = Request.JOIN_ROOM;
     private byte[] data;
 
     public JoinRoomRequest(byte[] data) {

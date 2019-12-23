@@ -1,6 +1,6 @@
 package ru.kpfu.itis.gallows.server;
 
-import ru.kpfu.itis.gallows.exception.RequestException;
+import ru.kpfu.itis.gallows.protocol.exception.RequestException;
 import ru.kpfu.itis.gallows.exception.ServerException;
 import ru.kpfu.itis.gallows.protocol.RequestHandler;
 import ru.kpfu.itis.gallows.protocol.request.CreateRoomRequest;
@@ -21,18 +21,23 @@ public class Server {
     private final int ROOM_LIMIT = 10;
     private ServerSocket server;
     private int port;
+    private int roomNumber;
     private boolean started = false;
     private HashMap<Integer, Room> rooms;
     private int roomCode = 10;
     private ExecutorService roomExecutor = Executors.newCachedThreadPool();
     public Server(int port) throws ServerException {
         this.port = port;
-        rooms = new HashMap<Integer, Room>();
+        rooms = new HashMap<>();
     }
 
     public void start() throws ServerException {
         try {
             server = new ServerSocket(port);
+            while (true){
+                Socket socket = server.accept();
+                handleConnection(socket);
+            }
         } catch (IOException e) {
             throw new ServerException("Unable to start server: " + e.getMessage());
         }
@@ -46,17 +51,19 @@ public class Server {
                 Request socketRequest = RequestHandler.readRequest(inputStream);
                 switch (socketRequest.getType()){
                     case Request.CREATE_ROOM:
+                        if (roomNumber == ROOM_LIMIT){
+                            outputStream.write(new ErrorResponse(Response.MAXIMUM_NUMBER_REACHED_ERROR).getBytes());
+                        }
                         int playerNum = ((CreateRoomRequest) socketRequest).getNumOfPlayers();
                         Room room = new Room(playerNum, roomCode);
                         rooms.put(roomCode, room);
+                        room.acceptPlayer(client);
                         roomCode++;
+                        roomNumber++;
                         break;
                     case Request.JOIN_ROOM:
                         if (rooms.containsKey(((JoinRoomRequest) socketRequest).getRoomCode())){
                             rooms.get(roomCode).acceptPlayer(client);
-                            byte [] numOfPlayers = new byte[1];
-                            numOfPlayers[0] = (byte) rooms.get(roomCode).getNumOfPlayers();
-                            outputStream.write(new OkResponse(Response.STATUS_OK, numOfPlayers).getBytes());
                         }
                         else{
                             outputStream.write(new ErrorResponse(Response.ROOM_NOT_FOUND_ERROR).getBytes());
@@ -69,6 +76,8 @@ public class Server {
 
             }
         } catch (IOException | RequestException e) {
+            e.printStackTrace();
+        } catch (ServerException e) {
             e.printStackTrace();
         }
     }

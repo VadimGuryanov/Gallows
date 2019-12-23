@@ -7,7 +7,7 @@ public abstract class Response implements IResponse{
     private byte TYPE;
     protected byte status;
 
-    byte getStatus() {
+    public byte getStatus() {
         return status;
     }
 
@@ -20,6 +20,14 @@ public abstract class Response implements IResponse{
             bytes[i + 3] = data[i];
         }
         return bytes;
+    }
+
+    public byte getType(){
+        return TYPE;
+    }
+
+    public byte[] getData(){
+        return this.data;
     }
 
     public Response(byte[] data) {

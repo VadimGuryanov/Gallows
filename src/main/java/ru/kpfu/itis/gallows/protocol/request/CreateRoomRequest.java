@@ -1,7 +1,7 @@
 package ru.kpfu.itis.gallows.protocol.request;
 
 public class CreateRoomRequest extends Request {
-    private final int TYPE = 0;
+    private final int TYPE = Request.CREATE_ROOM;
     private byte[] data;
 
     public CreateRoomRequest(byte[] data) {

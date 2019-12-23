@@ -1,8 +1,8 @@
 package ru.kpfu.itis.gallows.client;
 
 
-import ru.kpfu.itis.gallows.exception.RequestException;
-import ru.kpfu.itis.gallows.exception.ResponseException;
+import ru.kpfu.itis.gallows.protocol.exception.RequestException;
+import ru.kpfu.itis.gallows.protocol.exception.ResponseException;
 import ru.kpfu.itis.gallows.protocol.RequestHandler;
 import ru.kpfu.itis.gallows.protocol.request.IRequest;
 import ru.kpfu.itis.gallows.protocol.request.SendLetterRequest;

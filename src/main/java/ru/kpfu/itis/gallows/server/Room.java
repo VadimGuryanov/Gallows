@@ -1,13 +1,13 @@
 package ru.kpfu.itis.gallows.server;
 
 import ru.kpfu.itis.gallows.client.ClientThread;
-import ru.kpfu.itis.gallows.exception.ResponseException;
+import ru.kpfu.itis.gallows.exception.ServerException;
+import ru.kpfu.itis.gallows.protocol.exception.ResponseException;
 import ru.kpfu.itis.gallows.protocol.response.*;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.rmi.ServerException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -85,7 +85,7 @@ public class Room implements Runnable {
         }
     }
 
-    public void acceptPlayer(Socket socket) {
+    public void acceptPlayer(Socket socket) throws ServerException {
         if (currentNumOfPlayers == numOfPlayers){
             try {
                 socket.getOutputStream().write(new ErrorResponse(Response.MAXIMUM_NUMBER_REACHED_ERROR).getBytes());
@@ -94,6 +94,14 @@ public class Room implements Runnable {
             }
         }
         players.add(socket);
+        byte [] data = new byte[2];
+        data [0] = (byte) this.getNumOfPlayers();
+        data [1] = (byte) this.word.length();
+        try {
+            sendResponse(new OkResponse((byte) 0, data), socket);
+        } catch (ServerException e) {
+            throw new ServerException(e.getMessage());
+        }
         currentNumOfPlayers++;
     }
 
@@ -112,5 +120,13 @@ public class Room implements Runnable {
 
     public int getCode() {
         return code;
+    }
+
+    public void sendResponse(Response response, Socket socket) throws ServerException {
+        try {
+            socket.getOutputStream().write(response.getBytes());
+        } catch (IOException e) {
+            throw new ServerException("Specified socket IO unavalaible.");
+        }
     }
 }

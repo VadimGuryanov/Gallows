@@ -1,7 +1,8 @@
 package ru.kpfu.itis.gallows.protocol.response;
 
-public class LetterReceivedResponse extends Response{
 
+public class LetterReceivedResponse extends Response{
+    private byte TYPE = Response.LETTER_RECEIVED;
     public LetterReceivedResponse(byte[] data) {
         super(data);
     }

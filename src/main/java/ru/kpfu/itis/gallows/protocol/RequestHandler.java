@@ -1,6 +1,6 @@
 package ru.kpfu.itis.gallows.protocol;
 
-import ru.kpfu.itis.gallows.exception.RequestException;
+import ru.kpfu.itis.gallows.protocol.exception.RequestException;
 import ru.kpfu.itis.gallows.protocol.request.*;
 
 import java.io.IOException;

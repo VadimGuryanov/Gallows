@@ -1,7 +1,7 @@
 package ru.kpfu.itis.gallows.protocol.request;
 
 public class SendLetterRequest extends Request {
-    private byte TYPE = 2;
+    private byte TYPE = Request.SEND_LETTER;
     private byte[] data;
 
     public SendLetterRequest(byte[] data) {
