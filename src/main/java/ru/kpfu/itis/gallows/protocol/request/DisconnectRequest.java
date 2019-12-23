@@ -22,4 +22,7 @@ public class DisconnectRequest extends Request {
         return TYPE;
     }
 
+    public DisconnectRequest() {
+        super(new byte[0]);
+    }
 }

@@ -3,13 +3,8 @@ package ru.kpfu.itis.gallows.client;
 import ru.kpfu.itis.gallows.exception.ClientException;
 import ru.kpfu.itis.gallows.protocol.ResponseHandler;
 import ru.kpfu.itis.gallows.protocol.exception.ResponseException;
-import ru.kpfu.itis.gallows.protocol.request.CreateRoomRequest;
-import ru.kpfu.itis.gallows.protocol.request.JoinRoomRequest;
-import ru.kpfu.itis.gallows.protocol.request.Request;
-import ru.kpfu.itis.gallows.protocol.request.SendLetterRequest;
-import ru.kpfu.itis.gallows.protocol.response.OkResponse;
+import ru.kpfu.itis.gallows.protocol.request.*;
 import ru.kpfu.itis.gallows.protocol.response.Response;
-import ru.kpfu.itis.gallows.provider.HostProvider;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,7 +31,7 @@ public class BasicClient {
         }
     }
 
-    public void SendRequest(Request request) throws ClientException {
+    public void sendRequest(Request request) throws ClientException {
         try {
             outputStream.write(request.getBytes());
         } catch (IOException e) {
@@ -53,7 +48,7 @@ public class BasicClient {
     }
 
     public void createRoom(int numOfPlayers) throws ClientException {
-        this.SendRequest(new CreateRoomRequest((byte) numOfPlayers));
+        this.sendRequest(new CreateRoomRequest((byte) numOfPlayers));
         Response response = this.getResponse();
         if (response.getStatus() == Response.STATUS_OK){
             this.numOfPlayers = numOfPlayers;
@@ -77,7 +72,7 @@ public class BasicClient {
         }
     }
     public void joinRoom(int roomCode) throws ClientException {
-        this.SendRequest(new JoinRoomRequest((byte) roomCode));
+        this.sendRequest(new JoinRoomRequest((byte) roomCode));
         Response response = this.getResponse();
         if (response.getStatus() == Response.STATUS_OK){
             word = new char[response.getData()[1]];
@@ -109,7 +104,7 @@ public class BasicClient {
     }
 
     public void sendLetter(char letter) throws ClientException {
-        SendRequest(new SendLetterRequest(letter));
+        sendRequest(new SendLetterRequest(letter));
         getLetterResponse();
     }
     public void getLetterResponse() throws ClientException {
@@ -123,5 +118,9 @@ public class BasicClient {
         else {
             incorrectNum++;
         }
+    }
+
+    public void disconnect() throws ClientException {
+        sendRequest(new DisconnectRequest());
     }
 }
