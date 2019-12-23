@@ -21,6 +21,7 @@ public class BasicClient {
     private int numOfPlayers;
     private int incorrectNum = 0;
     private boolean created = false;
+
     public BasicClient(int port, String host) throws ClientException {
         this.port = port;
         this.host = host;

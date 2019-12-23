@@ -43,6 +43,21 @@ public class Server {
         }
     }
 
+    private void createRoom(Socket client, Request socketRequest) throws ServerException {
+        if (roomNumber == ROOM_LIMIT){
+            try {
+                client.getOutputStream().write(new ErrorResponse(Response.MAXIMUM_NUMBER_REACHED_ERROR).getBytes());
+            } catch (IOException e) {
+                throw new ServerException(e);
+            }
+        }
+        int playerNum = ((CreateRoomRequest) socketRequest).getNumOfPlayers();
+        Room room = new Room(playerNum, roomCode);
+        rooms.put(roomCode, room);
+        room.acceptPlayer(client);
+        roomCode++;
+        roomNumber++;
+    }
     public void handleConnection(Socket client){
         try {
             while ((client = server.accept()) != null) {
@@ -51,22 +66,15 @@ public class Server {
                 Request socketRequest = RequestHandler.readRequest(inputStream);
                 switch (socketRequest.getType()){
                     case Request.CREATE_ROOM:
-                        if (roomNumber == ROOM_LIMIT){
-                            outputStream.write(new ErrorResponse(Response.MAXIMUM_NUMBER_REACHED_ERROR).getBytes());
-                        }
-                        int playerNum = ((CreateRoomRequest) socketRequest).getNumOfPlayers();
-                        Room room = new Room(playerNum, roomCode);
-                        rooms.put(roomCode, room);
-                        room.acceptPlayer(client);
-                        roomCode++;
-                        roomNumber++;
+                        createRoom(client, socketRequest);
                         break;
                     case Request.JOIN_ROOM:
                         if (rooms.containsKey(((JoinRoomRequest) socketRequest).getRoomCode())){
                             rooms.get(roomCode).acceptPlayer(client);
                         }
                         else{
-                            outputStream.write(new ErrorResponse(Response.ROOM_NOT_FOUND_ERROR).getBytes());
+                            createRoom(client, socketRequest);
+                            //outputStream.write(new ErrorResponse(Response.ROOM_NOT_FOUND_ERROR).getBytes());
                         }
                         break;
                     default:
